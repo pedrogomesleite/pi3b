@@ -1,0 +1,42 @@
+#frontend
+
+# Compiled output
+frontend/graph/dist
+frontend/graph/tmp
+frontend/graph/out-tsc
+frontend/graph/bazel-out
+
+# Node
+frontend/graph/node_modules
+frontend/graph/npm-debug.log
+frontend/graph/yarn-error.log
+
+# IDEs and editors
+frontend/graph/.idea/
+frontend/graph/.project
+frontend/graph/.classpath
+frontend/graph/.c9/
+frontend/graph/*.launch
+frontend/graph/.settings/
+frontend/graph/*.sublime-workspace
+
+# Visual Studio Code
+frontend/graph/.vscode/*
+frontend/graph/!.vscode/settings.json
+frontend/graph/!.vscode/tasks.json
+frontend/graph/!.vscode/launch.json
+frontend/graph/!.vscode/extensions.json
+frontend/graph/.history/*
+
+# Miscellaneous
+frontend/graph/.angular/cache
+frontend/graph/.sass-cache/
+frontend/graph/connect.lock
+frontend/graph/coverage
+frontend/graph/libpeerconnection.log
+frontend/graph/testem.log
+frontend/graph/typings
+
+# System files
+frontend/graph/.DS_Store
+frontend/graph/Thumbs.db
