@@ -1,1 +1,11 @@
-<div #canvasContainer></div>
+<div #canvasContainer class="canva"></div>
+<mat-card  class="center" appearance="outlined" (click)="$event.stopPropagation()">
+    <mat-form-field appearance="outline" (click)="$event.preventDefault()">
+      <mat-label>Nome da equipe</mat-label>
+        <input [value]="groupName" matInput placeholder="Digite o nome de sua equipe">
+    </mat-form-field>
+  <div class="btn-area" (click)="$event.preventDefault()">
+    <button (click)="goToGraph()" mat-raised-button color="primary" class="btn-continuar">Continuar <mat-icon>arrow_forward</mat-icon></button>
+    <button (click)="goToSelectmenu()" mat-icon-button color="primary" matTooltip="Visualizar seções"><mat-icon>remove_red_eye</mat-icon></button>
+  </div>
+</mat-card>

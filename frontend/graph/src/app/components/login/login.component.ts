@@ -1,315 +1,262 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import p5 from 'p5';
+import { NotExpr } from '@angular/compiler';
+import {Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import * as p from 'p5';
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-login',
-  standalone: true,
-  imports: [],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit, OnDestroy {
   private p5Instance: any;
   @ViewChild('canvasContainer', { static: true }) canvasContainer!: ElementRef;
+  groupName: string = '';
+
+  constructor(
+    private router: Router,
+  ) {
+  }
 
   ngOnInit(): void {
     this.createP5Instance();
   }
 
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event): void {
+    this.ngOnDestroy();
+    this.ngOnInit();
+  }
+
   ngOnDestroy(): void {
-    this.p5Instance.remove();
+    if (this.p5Instance) {
+      this.p5Instance.remove();
+    }
   }
 
   private createP5Instance(): void {
-    this.p5Instance = new p5(this.sketch.bind(this), this.canvasContainer.nativeElement);
+    this.p5Instance = new p(this.sketch.bind(this), this.canvasContainer.nativeElement);
   }
 
-
-  maxDis = 100;
-  visitado: NodeType = 'white';
-
-  private sketch(p: p5) {
-    let list: Circle[] = [];
-    let nList: Circle[] = [];
-    let offsetX = 0;
-    let offsetY = 0;
-    let dragging = false;
-    const gridSize = 20;
-    let gridBuffer: p5.Graphics;
-    let showNode: Circle | null = null;
-    const folha: NodeType = 'white';
-    const final: NodeType = 'red';
-    const caminho: NodeType = 'orange';
-    const primeiro: NodeType = 'green';
-
+  private sketch(p: p) {
     p.setup = () => {
-      p.angleMode(p.DEGREES);
-      p.createCanvas(2000, 2000);
+      p.createCanvas(p.windowWidth, p.windowHeight, p.WEBGL);
+      p.background(200);
 
-      gridBuffer = p.createGraphics(p.width + gridSize, p.height + gridSize);
+      // for(let i = 0; i < 30; i++) {
+      //   let newNode = new Circle(p.random(0, p.width), p.random(0, p.height));
+      //   if(nList.length > 0) {
+      //     for(let j = 0; j < 2; j++) {
+      //       let randIndex = p.floor(p.random(0, nList.length));
+      //       newNode.push(nList[randIndex]);
+      //       nList[randIndex].push(newNode);
+      //     }
 
-      this.grafoRecursivo(0, 0, 0, 0, 6, nList, p);
-      for (let i = 0; i < 1000; i++) {
-        let fixedNodes: Circle[] = [];
-        for (let ele of nList) {
-          this.moves(ele, nList);
-        }
-      }
-      let finalIndex = Math.round(p.random(0, nList.length));
-      nList[finalIndex].final = true;
-      nList[finalIndex].tipo = final;
-      offsetX = nList[finalIndex].x / 2;
-      offsetY = nList[finalIndex].y / 2;
-      p.noLoop();
-      p.draw();
+      //   }
+      //   nList.push(newNode);
+      // }
     };
 
+    let nList: Circle[] = [];
     p.draw = () => {
-      p.background(220);
-
-      p.image(gridBuffer, offsetX % gridSize - gridSize, offsetY % gridSize - gridSize);
-
-      p.stroke(0);
-      nList[0].tipo = primeiro;
-      for (let ele of nList) {
-        ele.createLine(offsetX, offsetY, p);
+      p.background(200);
+      p.translate(-p.width / 2, -p.height / 2);
+      if(p.frameCount === 200) {
+        p.frameCount = 0;
+      }
+      if(p.frameCount === 1) {
+        let newNode = new Circle(p.random(0, p.width), p.random(0, p.height));
+        if(nList.length > 0) {
+          let randIndex = p.floor(p.random(0, nList.length));
+          newNode.push(nList[randIndex]);
+          nList[randIndex].push(newNode);
+        }
+        nList.push(newNode);
       }
 
-      for (let ele of nList) {
-        ele.createCircle(offsetX, offsetY, p);
-      }
-
-      if (showNode) {
-        p.push();
-        p.stroke('yellow');
-        p.fill('green');
-        showNode.createLine(offsetX, offsetY, p);
-        showNode.createCircle(offsetX, offsetY, p);
-        p.pop();
-      }
-    };
-
-    p.mousePressed = () => {
-      dragging = true;
-      p.loop();
-    };
-
-    p.mouseReleased = () => {
-      dragging = false;
-      p.noLoop();
-    };
-
-    p.mouseDragged = () => {
-      if (dragging) {
-        offsetX -= p.pmouseX - p.mouseX;
-        offsetY -= p.pmouseY - p.mouseY;
-      }
+      nList.forEach((node) => {
+        node.create(nList, p);
+      })
     };
 
     p.mouseClicked = () => {
-      for (let node of nList) {
-        let distancia = p.dist(node.x, node.y, p.mouseX - offsetX, p.mouseY - offsetY);
-        if (distancia <= node.r / 2) {
-          showNode = node;
-          this.depthFirstSearch(node, nList, p);
-          return;
-        }
-      }
-    };
-  }
-
-  private grafoRecursivo(angle: number, x: number, y: number, dis: number, qtdR: number, nList: Circle[], p: p5): Circle | null {
-    if (qtdR === 0) {
-      return null;
-    }
-    qtdR = qtdR - 1;
-    let newX = x + p.cos(angle) * dis;
-    let newY = y + p.sin(angle) * dis;
-    let node = new Circle(newX, newY, this.maxDis - 5);
-    nList.push(node);
-    let qtd = p.random(1, 4);
-    if (dis === 0) {
-      dis = this.maxDis;
-    }
-
-    for (let i = 0; i < qtd; i++) {
-      let newAngle = angle + (360 / qtd) * i;
-      let newNode = this.grafoRecursivo(newAngle, newX, newY, dis, qtdR, nList, p);
-      if (!newNode) {
-        continue;
-      }
-      newNode.adList.push(node);
-      node.adList.push(newNode);
-    }
-
-    return node;
-  }
-
-  private moves(node: Circle, nList: Circle[]) {
-    for (let ele of nList) {
-      node.empurra(ele);
-    }
-    let fixedNodes: Circle[] = [];
-    if (!fixedNodes.includes(node)) {
-      fixedNodes.push(node);
-      for (let adNode of node.adList) {
-        if (!fixedNodes.includes(adNode)) {
-          node.puxa(adNode);
-          fixedNodes.push(adNode);
-        }
-      }
+      nList.forEach((node) => {
+        node.setRiple(p.mouseX, p.mouseY, p);
+      });
     }
   }
 
-  private depthFirstSearch(startNode: Circle, nList: Circle[], p: p5) {
-    let visited: Circle[] = [];
-    let found = false;
-    let nFinal: Circle | null = null;
-
-    const dfsRecursive = (node: Circle) => {
-      visited.push(node);
-      if (node.final) {
-        nFinal = node;
-        found = true;
-        return;
-      }
-      node.tipo = this.visitado;
-      for (let neighbor of node.adList) {
-        if (!visited.includes(neighbor) && !found) {
-          dfsRecursive(neighbor);
-        }
-      }
-    };
-
-    dfsRecursive(startNode);
-    if (nFinal) {
-      this.aStar(startNode, nFinal, p);
-    }
+  goToSelectmenu() {
+    this.router.navigate(["select-menu"]).then(() => {
+      this.groupName = '';
+    })
   }
 
-  private aStar(startNode: Circle, finalNode: Circle, p: p5) {
-    startNode.g = 0;
-    startNode.h = this.heuristic(startNode, finalNode, p);
-    startNode.f = startNode.g + startNode.h;
-
-    let openSet: Circle[] = [startNode];
-    let closedSet: Circle[] = [];
-
-    while (openSet.length > 0) {
-      let currentNode = this.findLowestFScore(openSet);
-
-      if (currentNode === finalNode) {
-        this.reconstructPath(currentNode);
-        return;
-      }
-
-      openSet = openSet.filter(node => node !== currentNode);
-      closedSet.push(currentNode);
-
-      for (let neighbor of currentNode.adList) {
-        if (closedSet.includes(neighbor)) {
-          continue;
-        }
-
-        let tentativeGScore = currentNode.g + this.distance(currentNode, neighbor, p);
-
-        if (!openSet.includes(neighbor)) {
-          openSet.push(neighbor);
-        } else if (tentativeGScore >= neighbor.g) {
-          continue;
-        }
-
-        neighbor.parent = currentNode;
-        neighbor.g = tentativeGScore;
-        neighbor.h = this.heuristic(neighbor, finalNode, p);
-        neighbor.f = neighbor.g + neighbor.h;
-      }
-    }
-  }
-
-  private findLowestFScore(set: Circle[]): Circle {
-    return set.reduce((lowest, node) => (node.f < lowest.f ? node : lowest));
-  }
-
-  private reconstructPath(currentNode: Circle | null) {
-    let current = currentNode;
-    while (current !== null) {
-      current.tipo = 'orange';
-      current = current.parent;
-    }
-  }
-
-  private distance(nodeA: Circle, nodeB: Circle, p: p5): number {
-    return p.dist(nodeA.x, nodeA.y, nodeB.x, nodeB.y);
-  }
-
-  private heuristic(node: Circle, finalNode: Circle, p: p5): number {
-    return p.dist(node.x, node.y, finalNode.x, finalNode.y);
+  goToGraph() {
+    this.router.navigate(["graph/" + this.groupName]).then(() => {
+      this.groupName = '';
+    });
   }
 }
 
-// Definição de tipos e classes
 type NodeType = 'white' | 'red' | 'orange' | 'green';
 
 class Circle {
-  x: number;
-  y: number;
-  r: number;
-  adList: Circle[];
-  tipo: NodeType;
-  final: boolean;
-  g: number;
-  h: number;
-  f: number;
-  parent: Circle | null;
-
-  constructor(x: number, y: number, r: number) {
+  constructor(
+    x: number,
+    y: number
+  ) {
     this.x = x;
     this.y = y;
-    this.r = r;
-    this.adList = [];
-    this.tipo = 'white';
-    this.final = false;
-    this.g = 0;
-    this.h = 0;
-    this.f = 0;
-    this.parent = null;
+  }
+  x: number;
+  y: number;
+  d: number = 20;
+  tipo: NodeType = 'white';
+  maxDis: number = 50;
+
+  minSize: number = 2000;
+  size: number = 0;
+  ripleX: number = 0;
+  ripleY: number = 0;
+  public adList: Circle[] = [];
+
+  push(node: Circle) {
+
+    !this.adList.includes(node)? this.adList.push(node): null;
+
   }
 
-  empurra(other: Circle) {
-    let d = Math.hypot(this.x - other.x, this.y - other.y);
-    let overlap = this.r + other.r - d;
-    if (overlap > 0) {
-      let dx = (this.x - other.x) / d * overlap;
-      let dy = (this.y - other.y) / d * overlap;
-      this.x += dx;
-      this.y += dy;
-      other.x -= dx;
-      other.y -= dy;
+  create(nList: Circle[],p: p) {
+    this.drawLines(p);
+    this.drawCircle(p);
+    this.adList.forEach((node) => {
+      this.move(node, p);
+    });
+    nList.forEach((node) => {
+      if(node !== this) {
+        this.foge(node, p);
+      }
+    });
+    this.ripleMove(p);
+    this.clip(p);
+  }
+
+  setRiple(x: number, y: number, p: p) {
+    let angle = p.atan2(x - this.x, y - this.y);
+
+    this.ripleX = (p.sin(angle) * this.minSize * -1) + this.x;
+    this.ripleY = (p.cos(angle) * this.minSize * -1) + this.y;
+
+
+    let scaleX = this.ripleX - this.x;
+    let scaleY = this.ripleY - this.y;
+
+    let magnitude = Math.sqrt(scaleX * scaleX + scaleY * scaleY);
+
+    let scaleFactor = 1 / p.abs(p.dist(this.x, this.y, x, y));
+
+    let newMagnitude = magnitude * scaleFactor;
+    let newX = (newMagnitude / magnitude) * scaleX + this.x;
+    let newY = (newMagnitude / magnitude) * scaleY + this.y;
+
+
+
+    this.ripleX = newX;
+    this.ripleY = newY;
+
+
+    this.size = p.dist(this.x, this.y, this.ripleX, this.ripleY);
+  }
+
+  ripleMove(p: p) {
+    this.size -= 1;
+    if(this.size < 0) {
+      this.size = 0;
+      return;
     }
+
+    const dx = this.ripleX - this.x;
+    const dy = this.ripleY - this.y;
+
+    const unitX = dx / p.abs(dx);
+    const unitY = dy / p.abs(dy);
+
+    this.x += unitX;
+    this.y += unitY;
   }
 
-  puxa(other: Circle) {
-    let d = Math.hypot(this.x - other.x, this.y - other.y);
-    if (d > this.r + other.r) {
-      let dx = (this.x - other.x) * 0.1;
-      let dy = (this.y - other.y) * 0.1;
-      this.x -= dx;
-      this.y -= dy;
-      other.x += dx;
-      other.y += dy;
+  move(target: Circle, p: p) {
+    const distance = p.dist(this.x, this.y, target.x, target.y);
+
+    if(distance <= this.maxDis){
+      return;
     }
+
+    const dx = target.x - this.x;
+    const dy = target.y - this.y;
+
+    const speedFactor = distance / this.maxDis;
+    const unitX = (dx / distance) * speedFactor;
+    const unitY = (dy / distance) * speedFactor;
+
+    this.x += unitX;
+    this.y += unitY;
   }
 
-  createCircle(offsetX: number, offsetY: number, p: p5) {
+  foge(target: Circle, p: p) {
+    const distance = p.dist(this.x, this.y, target.x, target.y);
+
+    if(distance >= this.maxDis){
+      return;
+    }
+
+    if(distance < this.d * 2) {
+      target.setRiple(this.x, this.y , p);
+      // target.adList.forEach((node) => {
+      //   node.setRiple(this.x, this.y , p);
+      // });
+    }
+
+    const dx = target.x - this.x;
+    const dy = target.y - this.y;
+
+    const speedFactor = distance / this.maxDis;
+    const unitX = (dx / distance) * speedFactor;
+    const unitY = (dy / distance) * speedFactor;
+
+    this.x -= unitX;
+    this.y -= unitY;
+  }
+
+  drawCircle(p: p) {
+    p.push();
     p.fill(this.tipo);
     p.stroke(0);
-    p.ellipse(this.x + offsetX, this.y + offsetY, this.r);
+    p.circle(this.x, this.y, this.d);
+    p.pop();
+    this.clip(p);
   }
 
-  createLine(offsetX: number, offsetY: number, p: p5) {
-    for (let neighbor of this.adList) {
-      p.line(this.x + offsetX, this.y + offsetY, neighbor.x + offsetX, neighbor.y + offsetY);
+  drawLines(p: p) {
+    p.push();
+    p.stroke(0);
+    this.adList.forEach((node) => {
+      p.line(this.x, this.y, node.x, node.y);
+    });
+    p.pop();
+  }
+
+  clip(p: p) {
+    if(this.x < 0) {
+      this.x = p.width;
+    } else if(this.x > p.width) {
+      this.x = 0;
+    }
+    if(this.y < 0) {
+      this.y = p.height;
+    } else if(this.y > p.height) {
+      this.y = 0;
     }
   }
 }

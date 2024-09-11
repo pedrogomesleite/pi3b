@@ -1,1 +1,77 @@
+// Custom Theming for Angular Material
+// For more information: https://material.angular.io/guide/theming
+@use '@angular/material' as mat;
+// Plus imports for other components in your app.
+
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+// Be sure that you only ever include this mixin once!
+@include mat.core();
+
+// Define the palettes for your theme using the Material Design palettes available in palette.scss
+// (imported above). For each palette, you can optionally specify a default, lighter, and darker
+// hue. Available color palettes: https://material.io/design/color/
+$graph-primary: mat.define-palette(mat.$indigo-palette);
+$graph-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+
+// The warn palette is optional (defaults to red).
+$graph-warn: mat.define-palette(mat.$red-palette);
+
+// Create the theme object. A theme consists of configurations for individual
+// theming systems such as "color" or "typography".
+$graph-theme: mat.define-light-theme((
+  color: (
+    primary: $graph-primary,
+    accent: $graph-accent,
+    warn: $graph-warn,
+  )
+));
+
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include mat.all-component-themes($graph-theme);
+
 /* You can add global styles to this file, and also import other style files */
+
+// Definir as variáveis CSS para os tons de indigo
+:root {
+  --indigo-50: #{mat.get-color-from-palette($graph-primary, 50)};
+  --indigo-100: #{mat.get-color-from-palette($graph-primary, 100)};
+  --indigo-200: #{mat.get-color-from-palette($graph-primary, 200)};
+  --indigo-300: #{mat.get-color-from-palette($graph-primary, 300)};
+  --indigo-400: #{mat.get-color-from-palette($graph-primary, 400)};
+  --indigo-500: #{mat.get-color-from-palette($graph-primary, 500)};
+  --indigo-600: #{mat.get-color-from-palette($graph-primary, 600)};
+  --indigo-700: #{mat.get-color-from-palette($graph-primary, 700)};
+  --indigo-800: #{mat.get-color-from-palette($graph-primary, 800)};
+  --indigo-900: #{mat.get-color-from-palette($graph-primary, 900)};
+
+  // Definir as variáveis CSS para os tons de pink
+  --pink-A100: #{mat.get-color-from-palette($graph-accent, A100)};
+  --pink-A200: #{mat.get-color-from-palette($graph-accent, A200)};
+  --pink-A400: #{mat.get-color-from-palette($graph-accent, A400)};
+  --pink-A700: #{mat.get-color-from-palette($graph-accent, A700)};
+}
+
+*,
+*::after,
+*::before {
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  font-size: 10px;
+  overflow: hidden;
+  --primary: $graph-primary;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
