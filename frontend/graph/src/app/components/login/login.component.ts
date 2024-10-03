@@ -1,4 +1,3 @@
-import { NotExpr } from '@angular/compiler';
 import {Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import * as p from 'p5';
 import {Router} from "@angular/router";

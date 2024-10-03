@@ -12,13 +12,16 @@ import { SelectMenuComponent } from './components/select-menu/select-menu.compon
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {MatRippleModule} from "@angular/material/core";
 import { GraphShowComponent } from './components/graphs/graph-show/graph-show.component';
+import {MatExpansionModule} from "@angular/material/expansion";
+import {SharedGraphService} from "./services/shared-graph.service";
+import {GraphService} from "./services/graph.manipulation.service";
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     SelectMenuComponent,
-    GraphShowComponent
+    GraphShowComponent,
   ],
   imports: [
     BrowserModule,
@@ -28,9 +31,13 @@ import { GraphShowComponent } from './components/graphs/graph-show/graph-show.co
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
-    MatRippleModule
+    MatRippleModule,
+    MatExpansionModule
   ],
-  providers: [],
+  providers: [
+    SharedGraphService,
+    GraphService,
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
