@@ -2,11 +2,15 @@ import {Component, OnInit} from '@angular/core';
 import {GraphService, Type} from "../../../services/graph.manipulation.service";
 import {NodeDto} from "../../../entitys/node/node.dto";
 import {SharedGraphService} from "../../../services/shared-graph.service";
+import { MatExpansionModule } from '@angular/material/expansion';
+import {Node2d} from "../../../entitys/node/node.2d";
 
 @Component({
-  selector: 'app-graph-show',
-  templateUrl: './graph-show.component.html',
-  styleUrls: ['./graph-show.component.scss']
+    selector: 'app-graph-show',
+    templateUrl: './graph-show.component.html',
+    styleUrls: ['./graph-show.component.scss'],
+    standalone: true,
+    imports: [MatExpansionModule]
 })
 export class GraphShowComponent implements OnInit {
 
@@ -16,10 +20,11 @@ export class GraphShowComponent implements OnInit {
   ) {
   }
 
+  kk2DMap?: Map<number, Node2d>;
+
   ngOnInit(): void {
-    this.fetchGrafo().then(r => {
-      this.graphService.returnNodeMap(Type.kk2d);
-      console.log(this.graph.getGraph());
+    this.fetchGrafo().then(async r => {
+      this.kk2DMap = await this.graphService.returnNodeMap(Type.kk2d);
     });
   }
 
@@ -32,9 +37,9 @@ export class GraphShowComponent implements OnInit {
     const graph: NodeDto[] = [];
 
     for (let i = 0; i < numVertices; i++) {
-      const numAdjacencias = Math.floor(Math.random() * (maxAdjacencias + 1));
+      let numAdjacencias = Math.floor(Math.random() * (maxAdjacencias + 1));
       const adjacencias: number[] = [];
-
+      numAdjacencias = numAdjacencias === 0? 1: numAdjacencias;
       while (adjacencias.length < numAdjacencias) {
         const randomAdj = Math.floor(Math.random() * numVertices);
 
@@ -43,7 +48,7 @@ export class GraphShowComponent implements OnInit {
         }
       }
 
-      const tipo = Math.floor(Math.random() * 2);
+      const tipo = 0;
 
       const node: NodeDto = {
         VerticeId: i,

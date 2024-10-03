@@ -1,11 +1,17 @@
 import {Component, OnInit} from '@angular/core';
 import {LeaderBoardPosition, Session} from "../../entitys/session-entitys";
 import {Router} from "@angular/router";
+import { MatIconModule } from '@angular/material/icon';
+import { MatRippleModule } from '@angular/material/core';
+import { MatCardModule } from '@angular/material/card';
+import { NgFor } from '@angular/common';
 
 @Component({
-  selector: 'app-select-menu',
-  templateUrl: 'select-menu.component.html',
-  styleUrls: ['./select-menu.component.scss']
+    selector: 'app-select-menu',
+    templateUrl: 'select-menu.component.html',
+    styleUrls: ['./select-menu.component.scss'],
+    standalone: true,
+    imports: [NgFor, MatCardModule, MatRippleModule, MatIconModule]
 })
 export class SelectMenuComponent implements OnInit {
 

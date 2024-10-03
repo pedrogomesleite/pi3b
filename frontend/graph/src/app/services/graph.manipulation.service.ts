@@ -1,7 +1,8 @@
 import {SharedGraphService} from "./shared-graph.service";
 import {Node2d} from "../entitys/node/node.2d";
+import {Injectable} from "@angular/core";
 
-
+@Injectable()
 export class GraphService {
 
   constructor(
@@ -10,7 +11,7 @@ export class GraphService {
 
   }
 
-  returnNodeMap(type: Type): Map<number, Node2d> {
+  async returnNodeMap(type: Type): Promise<Map<number, Node2d>> {
     let graph = this.graph.getGraph();
     let graphMap = new Map();
     for (let node of graph) {
