@@ -1,12 +1,16 @@
 {
   "name": "graph",
   "version": "0.0.0",
+  "main": "electron.js",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "electron": "electron .",
+    "package": "electron-packager . graph --platform=win32 --arch=x64 --out=dist/",
+    "package-over": "electron-packager . graph --platform=win32 --arch=x64 --out=dist/ --overwrite"
   },
   "private": true,
   "dependencies": {
@@ -31,6 +35,8 @@
     "@angular/compiler-cli": "^16.2.0",
     "@types/jasmine": "~4.3.0",
     "@types/p5": "^1.7.6",
+    "electron": "^32.1.2",
+    "electron-packager": "^17.1.2",
     "jasmine-core": "~4.6.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
