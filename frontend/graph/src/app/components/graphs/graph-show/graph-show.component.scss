@@ -1,0 +1,16 @@
+.side-menu {
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  width: 40rem;
+  padding: 1.5rem;
+  overflow-y: auto;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 1.3rem;
+}

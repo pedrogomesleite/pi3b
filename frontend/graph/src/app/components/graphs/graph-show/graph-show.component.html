@@ -1,9 +1,73 @@
 <div class="side-menu">
-  <mat-accordion>
+  <mat-accordion displayMode="default" togglePosition="after">
+    <mat-expansion-panel >
+      <mat-expansion-panel-header>
+        <mat-panel-title >
+          <div class="title">Seleção de modo de exibição</div>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <mat-chip-listbox>
+        <mat-chip-option
+          [selected]="show.kk2d"
+          (click)="selectOption('kk2d')"
+        >
+          KK 2D
+        </mat-chip-option>
+        <mat-chip-option
+          [selected]="show.kk3d"
+          (click)="selectOption('kk3d')"
+        >
+          KK 3D
+        </mat-chip-option>
+        <mat-chip-option
+          [selected]="show.matrix2d"
+          (click)="selectOption('matrix2d')"
+        >
+          Matrix 2D
+        </mat-chip-option>
+        <mat-chip-option
+          [selected]="show.circle2d"
+          (click)="selectOption('circle2d')"
+        >
+          Circulo 2D
+        </mat-chip-option>
+        <mat-chip-option
+          [selected]="show.matrix3d"
+          (click)="selectOption('matrix3d')"
+        >
+          Cubo 3D
+        </mat-chip-option>
+      </mat-chip-listbox>
+    </mat-expansion-panel>
     <mat-expansion-panel>
-      <mat-panel-title>
-        fala galera
-      </mat-panel-title>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <div class="title">Opções de navegação</div>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <p>Conteúdo dentro do expansion panel.</p>
+    </mat-expansion-panel>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <div class="title">Caminho achado</div>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <p>Conteúdo dentro do expansion panel.</p>
+    </mat-expansion-panel>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <div class="title">Estátisticas</div>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <p>Conteúdo dentro do expansion panel.</p>
     </mat-expansion-panel>
   </mat-accordion>
 </div>
+
+<app-config-2d [nList]="kk2DMap" *ngIf="show.kk2d"/>
+<app-config-3d [nList]="kk3DMap" *ngIf="show.kk3d"/>
+<app-config-2d [nList]="matrix2DMap" *ngIf="show.matrix2d"/>
+<app-config-2d [nList]="circle2DMap" *ngIf="show.circle2d"/>
+<app-config-3d [nList]="matrix3DMap" *ngIf="show.matrix3d"/>
