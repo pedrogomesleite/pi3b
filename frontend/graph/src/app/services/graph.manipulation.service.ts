@@ -102,8 +102,8 @@ export class GraphService {
 
     graphMap.forEach((node) => {
       if (node.x === false || node.y === false) {
-        node.x = Math.random() * 1000;
-        node.y = Math.random() * 1000;
+        node.x = Math.random() * 10 * graphMap.size;
+        node.y = Math.random() * 10 * graphMap.size;
       }
     });
 
@@ -176,13 +176,15 @@ export class GraphService {
   calculateNodesPositionKK3D(graphMap: Map<number, Node3d>): Map<number, Node3d> {
     const L0 = 100;
     const K = 0.05;
-    const minDistance = 50;
+
+
+    const minDistance = 200;
 
     graphMap.forEach((node) => {
       if (node.x === false || node.y === false || node.z === false) {
-        node.x = Math.random() * 1000;
-        node.y = Math.random() * 1000;
-        node.z = Math.random() * 1000;
+        node.x = Math.random() * 2.5 * graphMap.size;
+        node.y = Math.random() * 2.5 * graphMap.size;
+        node.z = Math.random() * 2.5 * graphMap.size;
       }
     });
 
@@ -214,7 +216,7 @@ export class GraphService {
         for (let j = i + 1; j < nodesArray.length; j++) {
           const dist = calcDistance(nodesArray[i], nodesArray[j]);
           if (dist < minDistance) {
-            const penalty = 0.5 * K * (minDistance - dist) * (minDistance - dist);
+            const penalty = K * (dist - minDistance) * (dist - minDistance);
             totalEnergy += penalty;
           }
         }
@@ -229,17 +231,19 @@ export class GraphService {
         let fy = 0;
         let fz = 0;
 
-        node1.adList.forEach((node2: Node3d) => {
-          const dist = calcDistance(node1, node2);
-          if (dist > 0) {
-            const deltaX = (node2.x as number) - (node1.x as number);
-            const deltaY = (node2.y as number) - (node1.y as number);
-            const deltaZ = (node2.z as number) - (node1.z as number);
-            const force = K * (dist - L0) / dist;
+        graphMap.forEach((node2) => {
+          if (node1 !== node2) {
+            const dist = calcDistance(node1, node2);
+            if (dist < minDistance) {
+              const deltaX = (node2.x as number) - (node1.x as number);
+              const deltaY = (node2.y as number) - (node1.y as number);
+              const deltaZ = (node2.z as number) - (node1.z as number);
+              const force = K * (minDistance - dist) / dist;
 
-            fx += force * deltaX;
-            fy += force * deltaY;
-            fz += force * deltaZ;
+              fx += force * deltaX;
+              fy += force * deltaY;
+              fz += force * deltaZ;
+            }
           }
         });
 
@@ -257,6 +261,7 @@ export class GraphService {
 
     return graphMap;
   }
+
 
 
   calculateNodesPositionMatrix(graphMap: Map<number, Node2d>): Map<number, Node2d> {
@@ -314,7 +319,7 @@ export class GraphService {
   calculateNodesPositionCube(graphMap: Map<number, Node3d>): Map<number, Node3d> {
     const totalNodes = graphMap.size;
 
-    const desiredDistance = 150;
+    const desiredDistance = 300;
 
 
     const cubeSize = Math.ceil(Math.cbrt(totalNodes)) * desiredDistance;

@@ -1,12 +1,17 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from "@angular/core";
 import * as p5 from 'p5';
 import { Node3d } from "../../../../entitys/node/node.3d";
+import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
+import {NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-config-3d',
-  template: '<div #canvasContainer style="width: 100%; height: 100vh;"></div>',
+  template: '<div #canvasContainer style="width: 100%; height: 100vh;"></div><mat-spinner *ngIf="nList"></mat-spinner>',
   standalone: true,
-  imports: []
+  imports: [
+    MatProgressSpinnerModule,
+    NgIf
+  ]
 })
 export class Config3d implements OnInit {
   @Input() nList?: Map<number, Node3d>;
@@ -16,6 +21,8 @@ export class Config3d implements OnInit {
 
   private lastMouseX?: number;
   private lastMouseY?: number;
+
+  private needRedraw: boolean = true;
 
   @ViewChild('canvasContainer', { static: true }) canvasContainer!: ElementRef;
 
@@ -31,6 +38,7 @@ export class Config3d implements OnInit {
     p.setup = () => {
       p.createCanvas(p.windowWidth, p.windowHeight, p.WEBGL);
 
+
       if (this.nList && this.nList.size > 0) {
         const firstNode = this.nList.values().next().value;
 
@@ -39,12 +47,28 @@ export class Config3d implements OnInit {
         this.cam.lookAt(firstNode.x, firstNode.y, firstNode.z);
       }
       p.orbitControl();
-      p.background(200);
+
     };
 
-    p.draw = () => {
-      p.background(200);
+    const maxRenderDistance = 1000;
 
+    p.draw = () => {
+      if (this.needRedraw) {
+        p.background(200);
+        // Desenhar os nós
+        this.nList?.forEach((node) => {
+          const distance = p.dist(<number>this.cam?.eyeX, <number>this.cam?.eyeY, <number>this.cam?.eyeZ, <number>node.x, <number>node.y, <number> node.z);
+          if (distance < maxRenderDistance)
+          node.drawLine(p);
+        });
+
+        this.nList?.forEach((node) => {
+          const distance = p.dist(<number>this.cam?.eyeX, <number>this.cam?.eyeY, <number>this.cam?.eyeZ, <number>node.x, <number>node.y, <number> node.z);
+          if (distance < maxRenderDistance)
+          node.drawSphere(p);
+        });
+        this.needRedraw = false;
+      }
       if (p.keyIsPressed) {
         const speed = 10;
         if (!this.cam) return;
@@ -66,16 +90,8 @@ export class Config3d implements OnInit {
         if (p.key === 'q') {
           this.cam.move(0, speed, 0);
         }
+        this.needRedraw = true;
       }
-
-      // Desenhar os nós
-      this.nList?.forEach((node) => {
-        node.drawLine(p);
-      });
-
-      this.nList?.forEach((node) => {
-        node.drawSphere(p);
-      });
     };
 
     p.windowResized = () => {
@@ -92,14 +108,13 @@ export class Config3d implements OnInit {
         const deltaX = p.mouseX - (this.lastMouseX ?? 0);
         const deltaY = p.mouseY - (this.lastMouseY ?? 0);
 
-        // Ajustar a direção da câmera com base no movimento do mouse
-        const sensitivity = 0.005; // Ajuste este valor para controlar a sensibilidade
-        this.cam.pan(-deltaX * sensitivity); // Multiplique para ajustar a sensibilidade
-        this.cam.tilt(deltaY * sensitivity); // Multiplique para ajustar a sensibilidade
+        const sensitivity = 0.005;
+        this.cam.pan(-deltaX * sensitivity);
+        this.cam.tilt(deltaY * sensitivity);
 
-        // Atualizar a última posição do mouse
         this.lastMouseX = p.mouseX;
         this.lastMouseY = p.mouseY;
+        this.needRedraw = true;
       }
     };
   }

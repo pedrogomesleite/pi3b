@@ -4,9 +4,9 @@ import {NodeDto} from "../../../entitys/node/node.dto";
 import {SharedGraphService} from "../../../services/shared-graph.service";
 import {MatExpansionModule} from '@angular/material/expansion';
 import {Node2d} from "../../../entitys/node/node.2d";
-import {Config2d} from "./2d/2d-config";
+import {Config2d} from "./config/2d-config";
 import {Node3d} from "../../../entitys/node/node.3d";
-import {Config3d} from "./2d/3d-config";
+import {Config3d} from "./config/3d-config";
 import {NgIf} from "@angular/common";
 import {MatChipsModule} from "@angular/material/chips";
 
@@ -50,7 +50,7 @@ export class GraphShowComponent implements OnInit {
 
 
   async fetchGrafo() {
-    this.graph.setGraph(this.generateRandomGraph(20, 3, 1));
+    this.graph.setGraph(this.generateRandomGraph(1000, 3, 1));
   }
 
   generateRandomGraph(numVertices: number, maxAdjacencias: number, labirintoId: number): NodeDto[] {

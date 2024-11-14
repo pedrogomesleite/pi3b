@@ -2,12 +2,17 @@ import {Component, ElementRef, Input, OnInit, ViewChild} from "@angular/core";
 import * as p5 from 'p5';
 import {Node2d} from "../../../../entitys/node/node.2d";
 import {Node3d} from "../../../../entitys/node/node.3d";
+import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
+import {NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-config-2d',
-  template: '<div #canvasContainer style="width: 100%; height: 100vh;"></div>',
+  template: '<div #canvasContainer style="width: 100%; height: 100vh;"></div> <mat-spinner *ngIf="nList"></mat-spinner>',
   standalone: true,
-  imports: []
+  imports: [
+    MatProgressSpinnerModule,
+    NgIf
+  ]
 })
 export class Config2d implements OnInit {
   @Input() nList?: Map<number, Node2d>;
@@ -34,6 +39,7 @@ export class Config2d implements OnInit {
     p.setup = () => {
       p.createCanvas(p.windowWidth, p.windowHeight);
       p.background(200);
+      p.noLoop();
     };
 
     p.draw = () => {
@@ -42,10 +48,10 @@ export class Config2d implements OnInit {
       p.translate(this.offsetX, this.offsetY);
       this.nList?.forEach((node) => {
         node.drawLine(p);
-      })
+      });
       this.nList?.forEach((node) => {
         node.drawCircle(p);
-      })
+      });
     };
 
     p.mousePressed = () => {
@@ -58,15 +64,18 @@ export class Config2d implements OnInit {
       if (this.dragging) {
         this.offsetX = p.mouseX - this.startX;
         this.offsetY = p.mouseY - this.startY;
+        p.redraw();
       }
     };
 
     p.mouseReleased = () => {
       this.dragging = false;
+      p.redraw();
     };
 
     p.windowResized = () => {
       p.resizeCanvas(p.windowWidth, p.windowHeight);
+      p.redraw();
     };
   }
 }
