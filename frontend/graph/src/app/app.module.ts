@@ -16,6 +16,7 @@ import {MatExpansionModule} from "@angular/material/expansion";
 import {SharedGraphService} from "./services/shared-graph.service";
 import {GraphService} from "./services/graph.manipulation.service";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {HttpClientModule} from "@angular/common/http";
 
 @NgModule({
   declarations: [AppComponent],
@@ -32,7 +33,8 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
     LoginComponent,
     SelectMenuComponent,
     GraphShowComponent,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    HttpClientModule
   ],
   providers: [
     SharedGraphService,

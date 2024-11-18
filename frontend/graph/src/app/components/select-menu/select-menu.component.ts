@@ -5,6 +5,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
 import { MatCardModule } from '@angular/material/card';
 import { NgFor } from '@angular/common';
+import {HttpClient} from "@angular/common/http";
+import {api} from "../../api";
 
 @Component({
     selector: 'app-select-menu',
@@ -17,39 +19,33 @@ export class SelectMenuComponent implements OnInit {
 
   constructor(
     private router: Router,
+    private http: HttpClient,
   ) {
   }
 
   sessionTest: Session = {
-    qtdlabirintoSolucionados: 1,
-    labirintoAtualDescricao: "O labirinto mais traquilinho já visto",
+    id: "nome",
+    labirintos_concluidos: ["teste1", "teste2"],
     nome: "Time vencedor",
-    tempo: "05:25:12",
-    pontuacao: "300",
   };
 
   sessionTest2: Session = {
-    qtdlabirintoSolucionados: 21,
-    labirintoAtualDescricao: "O labirinto mais traquilinho já visto",
+    id: "nome",
+    labirintos_concluidos: ["teste1", "teste2"],
     nome: "Sociedade do teu anel",
-    tempo: "03:20:34",
-    pontuacao: "250",
   };
 
   sessionTest3: Session = {
-    qtdlabirintoSolucionados: 5,
-    labirintoAtualDescricao: "O labirinto mais traquilinho já visto",
+    id: "nome",
+    labirintos_concluidos: ["teste1", "teste2"],
     nome: "Faltou um pouco de criatividade",
-    tempo: "20:00:07",
-    pontuacao: "230",
+
   };
 
   sessionTest4: Session = {
-    qtdlabirintoSolucionados: 10,
-    labirintoAtualDescricao: "O labirinto mais traquilinho já visto",
+    id: "nome",
+    labirintos_concluidos: ["teste1", "teste2"],
     nome: "Consorsio quitado",
-    tempo: "01:10:59",
-    pontuacao: "130",
   };
 
   sessionList: Session[] = [
@@ -95,10 +91,10 @@ export class SelectMenuComponent implements OnInit {
 
 
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     // fazer requisição para pegar todas as sessões lives e placar atual
     // fazer o filter do array de top3 e resto
-    for(let i = 4; i < 100; i++) {
+    for (let i = 4; i < 100; i++) {
       let epipa: LeaderBoardPosition = {
         index: i,
         nome: "teste",
@@ -106,6 +102,10 @@ export class SelectMenuComponent implements OnInit {
       }
       this.leaderBoard.push(epipa);
     }
+    await this.http.get(api + '/grupos').forEach((grupos) => {
+      // @ts-ignore
+      this.sessionList = grupos.Grupos;
+    })
   }
 
   getChampsPosition(index: number) {

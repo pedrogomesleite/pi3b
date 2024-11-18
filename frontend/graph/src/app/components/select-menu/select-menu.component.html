@@ -3,56 +3,53 @@
     <mat-card (click)="goToGraph(session.nome)" *ngFor="let session of sessionList" tabindex="0" matRipple class="card">
       <mat-card-title class="gradient-text title">{{session.nome}}</mat-card-title>
       <mat-card-subtitle class="card-content">
-        {{session.labirintoAtualDescricao}}
+        Id: {{session.id}}
       </mat-card-subtitle>
       <mat-card-subtitle class="card-content">
-        Qunatidade de labirintos solucionados: {{session.qtdlabirintoSolucionados}}
+        Labirintos solucionados:
       </mat-card-subtitle>
-      <mat-card-subtitle class="card-content">
-        Média de pontuação: {{session.pontuacao}}
-      </mat-card-subtitle>
-      <mat-card-subtitle class="card-content">
-        Tempo gasto atual: {{session.tempo}}
+      <mat-card-subtitle class="card-content" *ngFor="let lab of session.labirintos_concluidos">
+       {{lab}}
       </mat-card-subtitle>
     </mat-card>
   </div>
-  <div class="right-area">
-    <h1>
-      Leaderboard <mat-icon>equalizer</mat-icon>
-    </h1>
-    <div class="leaderboard-area">
-      <div class="top3-area">
-        <div class="chaps-area"
-             *ngFor="let champs of leaderBoardTop3"
-             [style]="getChampsPosition(champs.index)">
-          <span class="gradient-text">{{champs.nome}}</span>
-          <span>Média: {{champs.pontuacao}}</span>
-        </div>
+<!--  <div class="right-area">-->
+<!--    <h1>-->
+<!--      Leaderboard <mat-icon>equalizer</mat-icon>-->
+<!--    </h1>-->
+<!--    <div class="leaderboard-area">-->
+<!--      <div class="top3-area">-->
+<!--        <div class="chaps-area"-->
+<!--             *ngFor="let champs of leaderBoardTop3"-->
+<!--             [style]="getChampsPosition(champs.index)">-->
+<!--          <span class="gradient-text">{{champs.nome}}</span>-->
+<!--          <span>Média: {{champs.pontuacao}}</span>-->
+<!--        </div>-->
 
-        <div class="pilar-head pilar" style="grid-column: 1 / 2; grid-row: 4 / 5">&nbsp;</div>
-        <div class="pilar-head pilar" style="grid-column: 2 / 3; grid-row: 2 / 3">&nbsp;</div>
-        <div class="pilar-head pilar" style="grid-column: 3 / 4; grid-row: 3 / 4">&nbsp;</div>
+<!--        <div class="pilar-head pilar" style="grid-column: 1 / 2; grid-row: 4 / 5">&nbsp;</div>-->
+<!--        <div class="pilar-head pilar" style="grid-column: 2 / 3; grid-row: 2 / 3">&nbsp;</div>-->
+<!--        <div class="pilar-head pilar" style="grid-column: 3 / 4; grid-row: 3 / 4">&nbsp;</div>-->
 
-        <div class="pilar-base pilar" style="grid-column: 2 / 3; grid-row: 3 / 4">&nbsp;</div>
-        <div class="pilar-base pilar" style="grid-column: 2 / 3; grid-row: 4 / 5">&nbsp;</div>
-        <div class="pilar-base pilar" style="grid-column: 3 / 4; grid-row: 4 / 5">&nbsp;</div>
-      </div>
-      <div class="not-champs-area">
-        <div class="not-champs">
-          <span>Posição</span>
-          <span>Nome da equipe</span>
-          <span>Média</span>
-        </div>
-        <div class="scroll-not-champs">
-          <div class="not-champs"
-               *ngFor="let champs of leaderBoard"
-               [style]="getColor(champs.index)">
-            <span>{{champs.index}}</span>
-            <span>{{champs.nome}}</span>
-            <span>{{champs.pontuacao}}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<!--        <div class="pilar-base pilar" style="grid-column: 2 / 3; grid-row: 3 / 4">&nbsp;</div>-->
+<!--        <div class="pilar-base pilar" style="grid-column: 2 / 3; grid-row: 4 / 5">&nbsp;</div>-->
+<!--        <div class="pilar-base pilar" style="grid-column: 3 / 4; grid-row: 4 / 5">&nbsp;</div>-->
+<!--      </div>-->
+<!--      <div class="not-champs-area">-->
+<!--        <div class="not-champs">-->
+<!--          <span>Posição</span>-->
+<!--          <span>Nome da equipe</span>-->
+<!--          <span>Média</span>-->
+<!--        </div>-->
+<!--        <div class="scroll-not-champs">-->
+<!--          <div class="not-champs"-->
+<!--               *ngFor="let champs of leaderBoard"-->
+<!--               [style]="getColor(champs.index)">-->
+<!--            <span>{{champs.index}}</span>-->
+<!--            <span>{{champs.nome}}</span>-->
+<!--            <span>{{champs.pontuacao}}</span>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
 </body>

@@ -1,10 +1,8 @@
 
 export interface Session {
+  id: String,
   nome: string;
-  qtdlabirintoSolucionados: number;
-  labirintoAtualDescricao: string;
-  tempo: string;
-  pontuacao: string;
+  labirintos_concluidos: string[],
 }
 
 export interface LeaderBoardPosition {

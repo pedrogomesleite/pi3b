@@ -9,6 +9,7 @@ import {Node3d} from "../../../entitys/node/node.3d";
 import {Config3d} from "./config/3d-config";
 import {NgIf} from "@angular/common";
 import {MatChipsModule} from "@angular/material/chips";
+import {HttpClient} from "@angular/common/http";
 
 @Component({
   selector: 'app-graph-show',
@@ -22,6 +23,7 @@ export class GraphShowComponent implements OnInit {
   constructor(
     private graphService: GraphService,
     private graph: SharedGraphService,
+    private http: HttpClient,
   ) {
   }
 
