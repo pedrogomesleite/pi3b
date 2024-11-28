@@ -10,6 +10,7 @@ import {Config3d} from "./config/3d-config";
 import {NgIf} from "@angular/common";
 import {MatChipsModule} from "@angular/material/chips";
 import {HttpClient} from "@angular/common/http";
+import {ActivatedRoute} from "@angular/router";
 
 @Component({
   selector: 'app-graph-show',
@@ -24,6 +25,7 @@ export class GraphShowComponent implements OnInit {
     private graphService: GraphService,
     private graph: SharedGraphService,
     private http: HttpClient,
+    private route: ActivatedRoute,
   ) {
   }
 
@@ -43,7 +45,12 @@ export class GraphShowComponent implements OnInit {
 
   mapList: (Map<number, Node3d | Node2d> | undefined)[] = [];
 
+  nome?: string;
+
   ngOnInit(): void {
+    this.route.params.subscribe(params => {
+      this.nome = params['nome'];
+    });
     this.fetchGrafo().then(async r => {
       [this.kk2DMap, this.kk3DMap, this.matrix2DMap, this.circle2DMap, this.matrix3DMap] = await this.graphService.returnNodeMapList();
     });
@@ -52,6 +59,8 @@ export class GraphShowComponent implements OnInit {
 
 
   async fetchGrafo() {
+    console.log(this.nome);
+
     this.graph.setGraph(this.generateRandomGraph(1000, 3, 1));
   }
 

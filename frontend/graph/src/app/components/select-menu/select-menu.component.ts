@@ -102,7 +102,7 @@ export class SelectMenuComponent implements OnInit {
       }
       this.leaderBoard.push(epipa);
     }
-    await this.http.get(api + '/grupos').forEach((grupos) => {
+    await this.http.get(api + 'grupos').forEach((grupos) => {
       // @ts-ignore
       this.sessionList = grupos.Grupos;
     })
