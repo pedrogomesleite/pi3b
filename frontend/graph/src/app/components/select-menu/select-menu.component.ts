@@ -48,12 +48,7 @@ export class SelectMenuComponent implements OnInit {
     nome: "Consorsio quitado",
   };
 
-  sessionList: Session[] = [
-    this.sessionTest,
-    this.sessionTest2,
-    this.sessionTest3,
-    this.sessionTest4,
-  ];
+  sessionList: Session[] = [];
 
   eqipe1: LeaderBoardPosition = {
     index: 1,
