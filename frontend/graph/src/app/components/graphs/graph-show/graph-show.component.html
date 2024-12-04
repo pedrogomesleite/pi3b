@@ -8,18 +8,6 @@
       </mat-expansion-panel-header>
       <mat-chip-listbox>
         <mat-chip-option
-          [selected]="show.kk2d"
-          (click)="selectOption('kk2d')"
-        >
-          KK 2D
-        </mat-chip-option>
-        <mat-chip-option
-          [selected]="show.kk3d"
-          (click)="selectOption('kk3d')"
-        >
-          KK 3D
-        </mat-chip-option>
-        <mat-chip-option
           [selected]="show.matrix2d"
           (click)="selectOption('matrix2d')"
         >
@@ -36,6 +24,17 @@
           (click)="selectOption('matrix3d')"
         >
           Cubo 3D
+        </mat-chip-option>
+        <mat-chip-option
+          [selected]="show.fa22D"
+          (click)="selectOption('fa22D')"
+        >
+          ForceAtlas2 2D
+        </mat-chip-option><mat-chip-option
+          [selected]="show.fa23D"
+          (click)="selectOption('fa23D')"
+        >
+          ForceAtlas2 3D
         </mat-chip-option>
       </mat-chip-listbox>
     </mat-expansion-panel>
@@ -66,8 +65,8 @@
   </mat-accordion>
 </div>
 
-<app-config-2d [nList]="kk2DMap" *ngIf="show.kk2d"/>
-<app-config-3d [nList]="kk3DMap" *ngIf="show.kk3d"/>
 <app-config-2d [nList]="matrix2DMap" *ngIf="show.matrix2d"/>
 <app-config-2d [nList]="circle2DMap" *ngIf="show.circle2d"/>
 <app-config-3d [nList]="matrix3DMap" *ngIf="show.matrix3d"/>
+<app-config-2d [nList]="fa22DMap" *ngIf="show.fa22D"/>
+<app-config-3d [nList]="fa23DMap" *ngIf="show.fa23D"/>

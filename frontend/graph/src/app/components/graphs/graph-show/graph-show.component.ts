@@ -30,18 +30,18 @@ export class GraphShowComponent implements OnInit {
   }
 
   show = {
-    kk2d: false,
-    kk3d: true,
     matrix2d: false,
     circle2d: false,
     matrix3d: false,
+    fa22D: true,
+    fa23D: false,
   }
 
-  kk2DMap?: Map<number, Node2d>;
-  kk3DMap?: Map<number, Node3d>;
   matrix2DMap?: Map<number, Node2d>;
   circle2DMap?: Map<number, Node2d>;
   matrix3DMap?: Map<number, Node3d>;
+  fa22DMap?: Map<number, Node2d>;
+  fa23DMap?: Map<number, Node3d>;
 
   mapList: (Map<number, Node3d | Node2d> | undefined)[] = [];
 
@@ -52,16 +52,16 @@ export class GraphShowComponent implements OnInit {
       this.nome = params['nome'];
     });
     this.fetchGrafo().then(async r => {
-      [this.kk2DMap, this.kk3DMap, this.matrix2DMap, this.circle2DMap, this.matrix3DMap] = await this.graphService.returnNodeMapList();
+      [this.matrix2DMap, this.circle2DMap, this.matrix3DMap, this.fa22DMap, this.fa23DMap] = await this.graphService.returnNodeMapList();
     });
-    this.mapList = [this.kk2DMap, this.kk3DMap, this.matrix2DMap, this.circle2DMap, this.matrix3DMap];
+    this.mapList = [this.matrix2DMap, this.circle2DMap, this.matrix3DMap, this.fa22DMap, this.fa23DMap];
   }
 
 
   async fetchGrafo() {
     console.log(this.nome);
 
-    this.graph.setGraph(this.generateRandomGraph(1000, 3, 1));
+    this.graph.setGraph(this.generateRandomGraph(100, 3, 1));
   }
 
   generateRandomGraph(numVertices: number, maxAdjacencias: number, labirintoId: number): NodeDto[] {
@@ -94,15 +94,15 @@ export class GraphShowComponent implements OnInit {
     return graph;
   }
 
-  selectOption(key: 'kk2d' | 'kk3d' | 'matrix2d' | 'circle2d' | 'matrix3d'): void {
+  selectOption(key:  'matrix2d' | 'circle2d' | 'matrix3d' | 'fa22D' | 'fa23D'): void {
 
     if (this.show[key]) return;
 
-    this.show.kk2d = false;
-    this.show.kk3d = false;
     this.show.matrix2d = false;
     this.show.circle2d = false;
     this.show.matrix3d = false;
+    this.show.fa22D = false;
+    this.show.fa23D = false;
 
     this.show[key] = true;
   }

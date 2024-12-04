@@ -15,8 +15,8 @@ export class GraphService {
   async returnNodeMapList(): Promise<
     [
       Map<number, Node2d>,
-      Map<number, Node3d>,
       Map<number, Node2d>,
+      Map<number, Node3d>,
       Map<number, Node2d>,
       Map<number, Node3d>,
     ]
@@ -40,11 +40,11 @@ export class GraphService {
     }
 
     return [
-      this.calculateNodesPositionKK2D(this.cloneNode2dMap(graphMap)),
-      this.calculateNodesPositionKK3D(this.cloneNode3dMap(graphMap3d)),
       this.calculateNodesPositionMatrix(this.cloneNode2dMap(graphMap)),
       this.calculateNodesPositionCircle(this.cloneNode2dMap(graphMap)),
       this.calculateNodesPositionCube(this.cloneNode3dMap(graphMap3d)),
+      this.calculateNodesPositionFA2(this.cloneNode2dMap(graphMap)),
+      this.calculateNodesPositionFA3D(this.cloneNode3dMap(graphMap3d)),
     ];
   }
 
@@ -94,168 +94,85 @@ export class GraphService {
     return clonedMap;
   }
 
+  calculateNodesPositionFA3D(graphMap: Map<number, Node3d>): Map<number, Node3d> {
+    const attractionStrength = 0.1; // Ajuste da força de atração
+    const repulsionStrength = 1000; // Ajuste da força de repulsão
+    const gravity = 0.1; // Força que puxa os nós para o centro
+    const maxIterations = 1000; // Número máximo de iterações
+    const tolerance = 0.001; // Tolerância para estabilidade
+    const speed = 1.0; // Fator de velocidade
 
-  calculateNodesPositionKK2D(graphMap: Map<number, Node2d>): Map<number, Node2d> {
-    const L0 = 100;
-    const K = 0.05;
-    const minDistance = 50;
-
-    graphMap.forEach((node) => {
-      if (node.x === false || node.y === false) {
-        node.x = Math.random() * 10 * graphMap.size;
-        node.y = Math.random() * 10 * graphMap.size;
-      }
-    });
-
-    let energy = Number.MAX_VALUE;
-    const tolerance = 0.001;
-    let iterations = 0;
-    const maxIterations = 1000;
-
-    function calcDistance(node1: Node2d, node2: Node2d): number {
-      const dx = (node2.x as number) - (node1.x as number);
-      const dy = (node2.y as number) - (node1.y as number);
-      return Math.sqrt(dx * dx + dy * dy);
-    }
-
-    function calcEnergy(): number {
-      let totalEnergy = 0;
-
-      graphMap.forEach((node1) => {
-        node1.adList.forEach((node2) => {
-          const dist = calcDistance(node1, node2);
-          const delta = dist - L0;
-          totalEnergy += 0.5 * K * delta * delta;
-        });
-      });
-
-      const nodesArray = Array.from(graphMap.values());
-      for (let i = 0; i < nodesArray.length; i++) {
-        for (let j = i + 1; j < nodesArray.length; j++) {
-          const dist = calcDistance(nodesArray[i], nodesArray[j]);
-          if (dist < minDistance) {
-            const penalty = 0.5 * K * (minDistance - dist) * (minDistance - dist);
-            totalEnergy += penalty;
-          }
-        }
-      }
-
-      return totalEnergy;
-    }
-
-    function adjustPositions() {
-      graphMap.forEach((node1) => {
-        let fx = 0;
-        let fy = 0;
-
-        node1.adList.forEach((node2) => {
-          const dist = calcDistance(node1, node2);
-          if (dist > 0) {
-            const deltaX = (node2.x as number) - (node1.x as number);
-            const deltaY = (node2.y as number) - (node1.y as number);
-            const force = K * (dist - L0) / dist;
-
-            fx += force * deltaX;
-            fy += force * deltaY;
-          }
-        });
-
-        node1.x = (node1.x as number) + fx;
-        node1.y = (node1.y as number) + fy;
-      });
-    }
-
-    while (energy > tolerance && iterations < maxIterations) {
-      adjustPositions();
-      energy = calcEnergy();
-      iterations++;
-    }
-    return graphMap;
-  }
-
-  calculateNodesPositionKK3D(graphMap: Map<number, Node3d>): Map<number, Node3d> {
-    const L0 = 100;
-    const K = 0.05;
-
-
-    const minDistance = 200;
-
+    // Inicializar posições dos nós se não existirem
     graphMap.forEach((node) => {
       if (node.x === false || node.y === false || node.z === false) {
-        node.x = Math.random() * 2.5 * graphMap.size;
-        node.y = Math.random() * 2.5 * graphMap.size;
-        node.z = Math.random() * 2.5 * graphMap.size;
+        node.x = Math.random() * graphMap.size * 10;
+        node.y = Math.random() * graphMap.size * 10;
+        node.z = Math.random() * graphMap.size * 10;
       }
     });
 
-    let energy = Number.MAX_VALUE;
-    const tolerance = 0.001;
     let iterations = 0;
-    const maxIterations = 1000;
+    let totalMovement = Number.MAX_VALUE;
 
-    function calcDistance(node1: Node3d, node2: Node3d): number {
-      const dx = (node2.x as number) - (node1.x as number);
-      const dy = (node2.y as number) - (node1.y as number);
-      const dz = (node2.z as number) - (node1.z as number);
-      return Math.sqrt(dx * dx + dy * dy + dz * dz);
-    }
+    while (iterations < maxIterations && totalMovement > tolerance) {
+      totalMovement = 0;
 
-    function calcEnergy(): number {
-      let totalEnergy = 0;
-
-      graphMap.forEach((node1) => {
-        node1.adList.forEach((node2) => {
-          const dist = calcDistance(node1, node2);
-          const delta = dist - L0;
-          totalEnergy += 0.5 * K * delta * delta;
-        });
-      });
-
+      // Forças de repulsão entre todos os pares de nós
       const nodesArray = Array.from(graphMap.values());
-      for (let i = 0; i < nodesArray.length; i++) {
-        for (let j = i + 1; j < nodesArray.length; j++) {
-          const dist = calcDistance(nodesArray[i], nodesArray[j]);
-          if (dist < minDistance) {
-            const penalty = K * (dist - minDistance) * (dist - minDistance);
-            totalEnergy += penalty;
-          }
-        }
-      }
+      nodesArray.forEach((node1) => {
+        let fx = 0, fy = 0, fz = 0;
 
-      return totalEnergy;
-    }
-
-    function adjustPositions() {
-      graphMap.forEach((node1) => {
-        let fx = 0;
-        let fy = 0;
-        let fz = 0;
-
-        graphMap.forEach((node2) => {
+        nodesArray.forEach((node2) => {
           if (node1 !== node2) {
-            const dist = calcDistance(node1, node2);
-            if (dist < minDistance) {
-              const deltaX = (node2.x as number) - (node1.x as number);
-              const deltaY = (node2.y as number) - (node1.y as number);
-              const deltaZ = (node2.z as number) - (node1.z as number);
-              const force = K * (minDistance - dist) / dist;
+            const dx = (node2.x as number) - (node1.x as number);
+            const dy = (node2.y as number) - (node1.y as number);
+            const dz = (node2.z as number) - (node1.z as number);
+            const distSquared = dx * dx + dy * dy + dz * dz || 0.01; // Evitar divisão por zero
+            const dist = Math.sqrt(distSquared);
 
-              fx += force * deltaX;
-              fy += force * deltaY;
-              fz += force * deltaZ;
-            }
+            // Força de repulsão
+            const repulsionForce = repulsionStrength / distSquared;
+            fx -= repulsionForce * (dx / dist);
+            fy -= repulsionForce * (dy / dist);
+            fz -= repulsionForce * (dz / dist);
           }
         });
 
-        node1.x = (node1.x as number) + fx;
-        node1.y = (node1.y as number) + fy;
-        node1.z = (node1.z as number) + fz;
-      });
-    }
+        // Forças de atração para nós adjacentes
+        node1.adList.forEach((node2) => {
+          const dx = (node2.x as number) - (node1.x as number);
+          const dy = (node2.y as number) - (node1.y as number);
+          const dz = (node2.z as number) - (node1.z as number);
+          const dist = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.01; // Evitar divisão por zero
 
-    while (energy > tolerance && iterations < maxIterations) {
-      adjustPositions();
-      energy = calcEnergy();
+          // Força de atração
+          const attractionForce = attractionStrength * dist;
+          fx += attractionForce * (dx / dist);
+          fy += attractionForce * (dy / dist);
+          fz += attractionForce * (dz / dist);
+        });
+
+        // Força gravitacional para puxar o nó para o centro
+        const centerX = 0;
+        const centerY = 0;
+        const centerZ = 0;
+        const dx = centerX - (node1.x as number);
+        const dy = centerY - (node1.y as number);
+        const dz = centerZ - (node1.z as number);
+        const distToCenter = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.01;
+        fx += gravity * dx / distToCenter;
+        fy += gravity * dy / distToCenter;
+        fz += gravity * dz / distToCenter;
+
+        // Atualizar posição do nó
+        node1.x = (node1.x as number) + fx * speed;
+        node1.y = (node1.y as number) + fy * speed;
+        node1.z = (node1.z as number) + fz * speed;
+
+        // Acumular movimento total para medir estabilidade
+        totalMovement += Math.sqrt(fx * fx + fy * fy + fz * fz);
+      });
+
       iterations++;
     }
 
@@ -263,6 +180,81 @@ export class GraphService {
   }
 
 
+  calculateNodesPositionFA2(graphMap: Map<number, Node2d>): Map<number, Node2d> {
+    const attractionStrength = 0.1; // Ajuste da força de atração
+    const repulsionStrength = 1000; // Ajuste da força de repulsão
+    const gravity = 0.1; // Força que puxa os nós para o centro
+    const maxIterations = 1000; // Número máximo de iterações
+    const tolerance = 0.001; // Tolerância para estabilidade
+    const speed = 1.0; // Fator de velocidade
+
+    // Inicializar posições dos nós se não existirem
+    graphMap.forEach((node) => {
+      if (node.x === false || node.y === false) {
+        node.x = Math.random() * graphMap.size * 10;
+        node.y = Math.random() * graphMap.size * 10;
+      }
+    });
+
+    let iterations = 0;
+    let totalMovement = Number.MAX_VALUE;
+
+    while (iterations < maxIterations && totalMovement > tolerance) {
+      totalMovement = 0;
+
+      // Forças de repulsão entre todos os pares de nós
+      const nodesArray = Array.from(graphMap.values());
+      nodesArray.forEach((node1) => {
+        let fx = 0, fy = 0;
+
+        nodesArray.forEach((node2) => {
+          if (node1 !== node2) {
+            const dx = (node2.x as number) - (node1.x as number);
+            const dy = (node2.y as number) - (node1.y as number);
+            const distSquared = dx * dx + dy * dy || 0.01; // Evitar divisão por zero
+            const dist = Math.sqrt(distSquared);
+
+            // Força de repulsão
+            const repulsionForce = repulsionStrength / distSquared;
+            fx -= repulsionForce * (dx / dist);
+            fy -= repulsionForce * (dy / dist);
+          }
+        });
+
+        // Forças de atração para nós adjacentes
+        node1.adList.forEach((node2) => {
+          const dx = (node2.x as number) - (node1.x as number);
+          const dy = (node2.y as number) - (node1.y as number);
+          const dist = Math.sqrt(dx * dx + dy * dy) || 0.01; // Evitar divisão por zero
+
+          // Força de atração
+          const attractionForce = attractionStrength * dist;
+          fx += attractionForce * (dx / dist);
+          fy += attractionForce * (dy / dist);
+        });
+
+        // Força gravitacional para puxar o nó para o centro
+        const centerX = 0;
+        const centerY = 0;
+        const dx = centerX - (node1.x as number);
+        const dy = centerY - (node1.y as number);
+        const distToCenter = Math.sqrt(dx * dx + dy * dy) || 0.01;
+        fx += gravity * dx / distToCenter;
+        fy += gravity * dy / distToCenter;
+
+        // Atualizar posição do nó
+        node1.x = (node1.x as number) + fx * speed;
+        node1.y = (node1.y as number) + fy * speed;
+
+        // Acumular movimento total para medir estabilidade
+        totalMovement += Math.sqrt(fx * fx + fy * fy);
+      });
+
+      iterations++;
+    }
+
+    return graphMap;
+  }
 
   calculateNodesPositionMatrix(graphMap: Map<number, Node2d>): Map<number, Node2d> {
     const totalNodes = graphMap.size;
