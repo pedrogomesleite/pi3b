@@ -86,8 +86,8 @@ export class GraphShowComponent implements OnInit {
   }
 
   async connectWebSocket(conexao: string) {
-    console.log(conexao)
-    this.websocket = new WebSocket(conexao + '/1');
+    console.log(conexao + 0)
+    this.websocket = new WebSocket(conexao + '0');
 
     this.websocket.onopen = () => {
       this.websocket?.send('labirinto');
