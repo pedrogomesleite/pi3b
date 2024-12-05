@@ -79,6 +79,8 @@ export class GraphShowComponent implements OnInit {
           this.connectWebSocket(sesso['conexao']);
         }
       }
+    }).catch(() => {
+      window.alert("Websocket closed!");
     });
   }
 
