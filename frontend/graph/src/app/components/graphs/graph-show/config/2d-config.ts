@@ -35,10 +35,23 @@ export class Config2d implements OnInit {
     this.p5Instance = new p5(this.sketch.bind(this), this.canvasContainer.nativeElement);
   }
 
+  private centerOnNodeZero(p: p5): void {
+    if (this.nList && this.nList.has(0)) {
+      const node = this.nList.get(0);
+      if (node) {
+        this.offsetX = p.width / 2 - <number>node.x;
+        this.offsetY = p.height / 2 - <number>node.y;
+
+        p.redraw();
+      }
+    }
+  }
+
   private sketch(p: p5) {
     p.setup = () => {
       p.createCanvas(p.windowWidth, p.windowHeight);
       p.background(200);
+      this.centerOnNodeZero(p);
       p.noLoop();
     };
 

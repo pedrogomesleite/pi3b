@@ -60,8 +60,9 @@ export class GraphShowComponent implements OnInit {
     this.route.params.subscribe(params => {
       this.id = params['id'];
       this.nome = params['nome'];
-      console.log(this.nome);
     });
+
+
     this.fetchGrafo().then();
   }
 
@@ -89,7 +90,7 @@ export class GraphShowComponent implements OnInit {
       const dataString: string = event.data;
       if (dataString.includes("Labirinto atual: ")) {
         this.labirinto_id = Number(dataString.replace("Labirinto atual: ", ""));
-        await this.http.get<Object[]>(api + 'labirintos/' + this.labirinto_id + '/arestas').forEach((nodes: any[]) => {
+        await this.http.get<Object[]>(api + 'labirintos/' + this.labirinto_id + '/arestas').forEach(async (nodes: any[]) => {
           const nodesMap = new Map<number, NodeDto>();
 
           for (let node of nodes) {
@@ -109,25 +110,32 @@ export class GraphShowComponent implements OnInit {
 
           const nodeList: NodeDto[] = Array.from(nodesMap.values());
           this.graph.setGraph(nodeList);
+          [this.matrix2DMap, this.circle2DMap, this.matrix3DMap, this.fa22DMap, this.fa23DMap] = await this.graphService.returnNodeMapList();
+          this.mapList = [this.matrix2DMap, this.circle2DMap, this.matrix3DMap, this.fa22DMap, this.fa23DMap];
+          this.processing = false;
+          console.log(this.matrix2DMap);
           this.websocket?.send('historico');
-        });
+          setInterval(() => {
+            this.websocket?.send('historico');
+          }, 3000);
+
+        }).then();
       }
       if (dataString.startsWith("[")) {
         const list: number[] = JSON.parse(dataString);
 
-        for (const node of this.graph.getGraph()) {
-          const tem = list.some((id) =>
-            id === node.VerticeId
-          )
-          if (tem) {
-            node.Tipo = 1;
-          }
+        for (const listKey in list) {
+          this.mapList.forEach((list?: Map<number, Node2d | Node3d>) => {
+            if (list) {
+              let item = list.get(Number(listKey));
+              if (item) {
+                item.tipo = 1;
+              }
+            }
+          })
         }
 
-        [this.matrix2DMap, this.circle2DMap, this.matrix3DMap, this.fa22DMap, this.fa23DMap] = await this.graphService.returnNodeMapList();
-        this.mapList = [this.matrix2DMap, this.circle2DMap, this.matrix3DMap, this.fa22DMap, this.fa23DMap];
-        this.processing = false;
-        console.log(this.matrix2DMap);
+
       }
     };
 

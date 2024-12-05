@@ -134,10 +134,4 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.groupName = '';
     })
   }
-
-  goToGraph() {
-    this.router.navigate(["graph/" + this.groupName]).then(() => {
-      this.groupName = '';
-    });
-  }
 }
