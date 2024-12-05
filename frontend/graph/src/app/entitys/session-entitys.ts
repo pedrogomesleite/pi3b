@@ -1,6 +1,6 @@
 
 export interface Session {
-  id: String,
+  id: string,
   nome: string;
   labirintos_concluidos: string[],
 }

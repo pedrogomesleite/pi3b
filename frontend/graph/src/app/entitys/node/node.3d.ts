@@ -1,5 +1,5 @@
 import * as p from 'p5';
-import { circleColor, lineColor } from "./colors";
+import {circleColor, circleColorFinal, circleDimColor, lineColor} from "./colors";
 
 export class Node3d {
 
@@ -9,10 +9,13 @@ export class Node3d {
   adList: Node3d[] = [];
   diameter: number = 20;
 
+  tipo: number = 0;
+
   id: number;
 
-  constructor(id: number) {
+  constructor(id: number, tipo: number) {
     this.id = id;
+    this.id = tipo;
   }
 
   drawLine(p: p) {
@@ -21,7 +24,14 @@ export class Node3d {
         p.stroke(lineColor);
         if (typeof this.x === "number" && typeof this.y === "number") {
           if (typeof this.z === "number") {
-            p.line(this.x, this.y, this.z, adjNode.x, adjNode.y, adjNode.z);
+            if (adjNode.tipo > 0) {
+              p.line(this.x, this.y, this.z, adjNode.x, adjNode.y, adjNode.z);
+            }
+            if (adjNode.tipo === 0 && this.tipo > 0) {
+              p.fill(circleDimColor);
+              p.translate(adjNode.x, adjNode.y, adjNode.z);
+              p.sphere(this.diameter / 2);
+            }
           }
         }
       }
@@ -30,11 +40,18 @@ export class Node3d {
 
   drawSphere(p: p) {
     if (this.x !== false && this.y !== false && this.z !== false) {
-      p.fill(circleColor);
+      if (this.tipo === 2) {
+        p.fill(circleColorFinal);
+      }
+      if (this.tipo === 1) {
+        p.fill(circleColor);
+      }
       p.noStroke();
       p.push();
       p.translate(this.x, this.y, this.z);
-      p.sphere(this.diameter / 2);
+      if (this.tipo > 0) {
+        p.sphere(this.diameter / 2);
+      }
       p.pop();
     }
   }

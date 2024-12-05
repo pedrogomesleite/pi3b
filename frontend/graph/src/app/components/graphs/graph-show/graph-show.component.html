@@ -1,3 +1,5 @@
+<mat-spinner *ngIf="processing" class="spinner" diameter="500"></mat-spinner>
+
 <div class="side-menu">
   <mat-accordion displayMode="default" togglePosition="after">
     <mat-expansion-panel >
@@ -57,7 +59,7 @@
     <mat-expansion-panel>
       <mat-expansion-panel-header>
         <mat-panel-title>
-          <div class="title">Estátisticas</div>
+          <div class="title">Estátisticas grupo: {{this.nome}}</div>
         </mat-panel-title>
       </mat-expansion-panel-header>
       <p>Conteúdo dentro do expansion panel.</p>

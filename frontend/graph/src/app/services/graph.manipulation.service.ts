@@ -27,8 +27,8 @@ export class GraphService {
 
     for (let node of graph) {
       if (graphMap.has(node.VerticeId)) continue;
-      let node2d: Node2d = new Node2d(node.VerticeId);
-      let node3d: Node3d = new Node3d(node.VerticeId);
+      let node2d: Node2d = new Node2d(node.VerticeId, node.Tipo);
+      let node3d: Node3d = new Node3d(node.VerticeId, node.Tipo);
       for (let adNode of node.Adjacencia) {
         if (graphMap.has(adNode)) {
           node2d.adList.push(graphMap.get(adNode)!);
@@ -52,14 +52,14 @@ export class GraphService {
     const clonedMap = new Map<number, Node2d>();
 
     originalMap.forEach((node) => {
-      const clonedNode = new Node2d(node.id);
+      const clonedNode = new Node2d(node.id, node.tipo);
       clonedNode.x = node.x;
       clonedNode.y = node.y;
       clonedNode.diameter = node.diameter;
 
 
       node.adList.forEach(adjNode => {
-        const adjClone = clonedMap.get(adjNode.id) || new Node2d(adjNode.id);
+        const adjClone = clonedMap.get(adjNode.id) || new Node2d(adjNode.id, adjNode.tipo);
         clonedNode.adList.push(adjClone);
         clonedMap.set(adjNode.id, adjClone);
       });
@@ -75,7 +75,7 @@ export class GraphService {
     const clonedMap = new Map<number, Node3d>();
 
     originalMap.forEach((node) => {
-      const clonedNode = new Node3d(node.id);
+      const clonedNode = new Node3d(node.id, node.tipo);
       clonedNode.x = node.x;
       clonedNode.y = node.y;
       clonedNode.z = node.z;
@@ -83,7 +83,7 @@ export class GraphService {
 
 
       node.adList.forEach(adjNode => {
-        const adjClone = clonedMap.get(adjNode.id) || new Node3d(adjNode.id);
+        const adjClone = clonedMap.get(adjNode.id) || new Node3d(adjNode.id, adjNode.tipo);
         clonedNode.adList.push(adjClone);
         clonedMap.set(adjNode.id, adjClone);
       });

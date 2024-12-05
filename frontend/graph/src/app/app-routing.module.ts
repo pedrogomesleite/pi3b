@@ -8,7 +8,7 @@ const routes: Routes = [
   {path: "", redirectTo: "login", pathMatch: "full"},
   {path: "login", component: LoginComponent},
   {path: "select-menu", component: SelectMenuComponent},
-  {path: "graph/:nome", component: GraphShowComponent},
+  {path: "graph/:id/:nome", component: GraphShowComponent},
 ];
 
 @NgModule({

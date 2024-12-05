@@ -11,13 +11,15 @@ import {NgIf} from "@angular/common";
 import {MatChipsModule} from "@angular/material/chips";
 import {HttpClient} from "@angular/common/http";
 import {ActivatedRoute} from "@angular/router";
+import {api} from "../../../api";
+import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 
 @Component({
   selector: 'app-graph-show',
   templateUrl: './graph-show.component.html',
   styleUrls: ['./graph-show.component.scss'],
   standalone: true,
-  imports: [MatExpansionModule, Config2d, Config3d, NgIf, MatChipsModule]
+  imports: [MatExpansionModule, Config2d, Config3d, NgIf, MatChipsModule, MatProgressSpinnerModule]
 })
 export class GraphShowComponent implements OnInit {
 
@@ -45,23 +47,97 @@ export class GraphShowComponent implements OnInit {
 
   mapList: (Map<number, Node3d | Node2d> | undefined)[] = [];
 
+  id?: string;
   nome?: string;
+  labirinto_id?: number;
+
+  private websocket: WebSocket | undefined;
+
+  processing: boolean = true;
 
   ngOnInit(): void {
+    this.graph.setGraph([]);
     this.route.params.subscribe(params => {
+      this.id = params['id'];
       this.nome = params['nome'];
+      console.log(this.nome);
     });
-    this.fetchGrafo().then(async r => {
-      [this.matrix2DMap, this.circle2DMap, this.matrix3DMap, this.fa22DMap, this.fa23DMap] = await this.graphService.returnNodeMapList();
-    });
-    this.mapList = [this.matrix2DMap, this.circle2DMap, this.matrix3DMap, this.fa22DMap, this.fa23DMap];
+    this.fetchGrafo().then();
   }
 
 
   async fetchGrafo() {
-    console.log(this.nome);
+    await this.http.get<Object[]>(api + 'sessoes').forEach((sessoes: any[]) => {
+      for (let sesso of sessoes) {
+        if (sesso['grupo_id'] === this.id) {
+          this.connectWebSocket(sesso['conexao']);
+        }
+      }
+    })
+  }
 
-    this.graph.setGraph(this.generateRandomGraph(100, 3, 1));
+  async connectWebSocket(conexao: string) {
+    this.websocket = new WebSocket(conexao);
+
+    this.websocket.onopen = () => {
+      this.websocket?.send('labirinto');
+    };
+
+    this.websocket.onmessage = async (event) => {
+      const data = event.data;
+      console.log('Mensagem recebida:', data);
+      const dataString: string = event.data;
+      if (dataString.includes("Labirinto atual: ")) {
+        this.labirinto_id = Number(dataString.replace("Labirinto atual: ", ""));
+        await this.http.get<Object[]>(api + 'labirintos/' + this.labirinto_id + '/arestas').forEach((nodes: any[]) => {
+          const nodesMap = new Map<number, NodeDto>();
+
+          for (let node of nodes) {
+            const origem = node.origem;
+            const destino = node.destino;
+
+            if (nodesMap.has(origem)) {
+              nodesMap.get(origem)?.Adjacencia.push(destino);
+            } else {
+              nodesMap.set(origem, {
+                VerticeId: origem,
+                Adjacencia: [destino],
+                Tipo: 0,
+              });
+            }
+          }
+
+          const nodeList: NodeDto[] = Array.from(nodesMap.values());
+          this.graph.setGraph(nodeList);
+          this.websocket?.send('historico');
+        });
+      }
+      if (dataString.startsWith("[")) {
+        const list: number[] = JSON.parse(dataString);
+
+        for (const node of this.graph.getGraph()) {
+          const tem = list.some((id) =>
+            id === node.VerticeId
+          )
+          if (tem) {
+            node.Tipo = 1;
+          }
+        }
+
+        [this.matrix2DMap, this.circle2DMap, this.matrix3DMap, this.fa22DMap, this.fa23DMap] = await this.graphService.returnNodeMapList();
+        this.mapList = [this.matrix2DMap, this.circle2DMap, this.matrix3DMap, this.fa22DMap, this.fa23DMap];
+        this.processing = false;
+        console.log(this.matrix2DMap);
+      }
+    };
+
+    this.websocket.onerror = (error) => {
+      console.error('Erro WebSocket:', error);
+    };
+
+    this.websocket.onclose = () => {
+      console.log('Conexão WebSocket fechada.');
+    };
   }
 
   generateRandomGraph(numVertices: number, maxAdjacencias: number, labirintoId: number): NodeDto[] {
@@ -85,7 +161,6 @@ export class GraphShowComponent implements OnInit {
         VerticeId: i,
         Adjacencia: adjacencias,
         Tipo: tipo,
-        LabirintoId: labirintoId
       };
 
       graph.push(node);
@@ -94,7 +169,7 @@ export class GraphShowComponent implements OnInit {
     return graph;
   }
 
-  selectOption(key:  'matrix2d' | 'circle2d' | 'matrix3d' | 'fa22D' | 'fa23D'): void {
+  selectOption(key: 'matrix2d' | 'circle2d' | 'matrix3d' | 'fa22D' | 'fa23D'): void {
 
     if (this.show[key]) return;
 
