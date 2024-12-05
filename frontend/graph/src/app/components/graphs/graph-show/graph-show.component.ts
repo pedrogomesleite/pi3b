@@ -62,13 +62,14 @@ export class GraphShowComponent implements OnInit {
       this.id = params['id'];
       this.nome = params['nome'];
     });
+    this.fetchGrafo().then();
 
     await this.http.get<any>(api + 'placar/' + this.id).forEach((placar) => {
+      console.log(placar);
+
       this.status = placar.labirintos;
       console.log(this.status);
-
     });
-    this.fetchGrafo().then();
   }
 
 
@@ -76,7 +77,7 @@ export class GraphShowComponent implements OnInit {
     await this.http.get<Object[]>(api + 'sessoes').forEach((sessoes: any[]) => {
       for (let sesso of sessoes) {
         if (sesso['grupo_id'] === this.id) {
-          this.connectWebSocket(sesso['conexao']);
+          this.connectWebSocket(sesso['conexao'], );
         }
       }
     }).catch(() => {
@@ -85,7 +86,8 @@ export class GraphShowComponent implements OnInit {
   }
 
   async connectWebSocket(conexao: string) {
-    this.websocket = new WebSocket(conexao);
+    console.log(conexao)
+    this.websocket = new WebSocket(conexao + '/1');
 
     this.websocket.onopen = () => {
       this.websocket?.send('labirinto');
