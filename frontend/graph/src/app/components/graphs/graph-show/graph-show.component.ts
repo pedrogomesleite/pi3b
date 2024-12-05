@@ -7,7 +7,7 @@ import {Node2d} from "../../../entitys/node/node.2d";
 import {Config2d} from "./config/2d-config";
 import {Node3d} from "../../../entitys/node/node.3d";
 import {Config3d} from "./config/3d-config";
-import {NgIf} from "@angular/common";
+import {NgForOf, NgIf} from "@angular/common";
 import {MatChipsModule} from "@angular/material/chips";
 import {HttpClient} from "@angular/common/http";
 import {ActivatedRoute} from "@angular/router";
@@ -19,7 +19,7 @@ import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
   templateUrl: './graph-show.component.html',
   styleUrls: ['./graph-show.component.scss'],
   standalone: true,
-  imports: [MatExpansionModule, Config2d, Config3d, NgIf, MatChipsModule, MatProgressSpinnerModule]
+  imports: [MatExpansionModule, Config2d, Config3d, NgIf, MatChipsModule, MatProgressSpinnerModule, NgForOf]
 })
 export class GraphShowComponent implements OnInit {
 
@@ -50,19 +50,24 @@ export class GraphShowComponent implements OnInit {
   id?: string;
   nome?: string;
   labirinto_id?: number;
+  status: any[] = [];
 
   private websocket: WebSocket | undefined;
 
   processing: boolean = true;
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.graph.setGraph([]);
     this.route.params.subscribe(params => {
       this.id = params['id'];
       this.nome = params['nome'];
     });
 
+    await this.http.get<any>(api + 'placar/' + this.id).forEach((placar) => {
+      this.status = placar.labirintos;
+      console.log(this.status);
 
+    });
     this.fetchGrafo().then();
   }
 
@@ -74,7 +79,7 @@ export class GraphShowComponent implements OnInit {
           this.connectWebSocket(sesso['conexao']);
         }
       }
-    })
+    });
   }
 
   async connectWebSocket(conexao: string) {

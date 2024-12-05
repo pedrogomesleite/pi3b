@@ -62,7 +62,11 @@
           <div class="title">Estátisticas grupo: {{this.nome}}</div>
         </mat-panel-title>
       </mat-expansion-panel-header>
-      <p>Conteúdo dentro do expansion panel.</p>
+      <div class="status" *ngFor="let st of status">
+        <h4>Labirinto: {{st.labirinto}}</h4>
+        <p>Passos: {{st.passos}}</p>
+        <p>Exploração: {{st.exploracao}}</p>
+      </div>
     </mat-expansion-panel>
   </mat-accordion>
 </div>
